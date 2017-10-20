@@ -34,5 +34,3 @@ docker run -e DURATION=600 -e SPEED=100000 \
 * `DURATION`: Write log continue time(seconds).
 
 `DURATION` and `MAX` must use one and can only use one.
-
-
