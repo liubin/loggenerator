@@ -6,8 +6,10 @@ import (
 	"math"
 	"math/rand"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strconv"
+	"syscall"
 	"time"
 )
 
@@ -34,16 +36,11 @@ func check(e error) {
 
 func main() {
 
-	// max log count or write duration
 	var max, duration int64
 	var speed int64 = 100
 	var size int64 = 256
-	var logCount int64
-	var totalStartAt, totalEndAt int64
-	var start time.Time
 	var e error
 	var debug bool
-	var w *bufio.Writer
 
 	s := os.Getenv("MAX")
 	if s != "" {
@@ -79,17 +76,38 @@ func main() {
 		debug = true
 	}
 
-	s = os.Getenv("OUTPUT")
-	if s == "" {
+	s = os.Getenv("MODE")
+	if s != "WEB" {
+		outlog(max, duration, speed, size, os.Getenv("OUTPUT"), debug)
+	}
+
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	sig := <-sigs
+	if debug {
+		fmt.Printf("Exit(%s)\n", sig)
+	}
+}
+
+func outlog(max, duration, speed, size int64, output string, debug bool) {
+
+	var logCount int64
+	var totalStartAt, totalEndAt int64
+	var start time.Time
+
+	var w *bufio.Writer
+
+	if output == "" {
 		w = bufio.NewWriter(os.Stdout)
 	} else {
 		if debug {
-			fmt.Printf(fmt.Sprintf("\nWrite to file: %s\n", s))
+			fmt.Printf(fmt.Sprintf("\nWrite to file: %s\n", output))
 		}
-		path := filepath.Dir(s)
+		path := filepath.Dir(output)
 		_ = os.MkdirAll(path, os.ModePerm)
 
-		f, err := os.Create(s)
+		f, err := os.Create(output)
 		check(err)
 
 		w = bufio.NewWriter(f)

@@ -32,5 +32,13 @@ docker run -e DURATION=600 -e SPEED=100000 \
 * `OUTPUT`: Log file full path(include log file name), if not provided, logs will be wrote to `stdout`
 * `SIZE`: Size of one line
 * `DURATION`: Write log continue time(seconds).
+* `MODE`: `WEB` to use web api to controll, otherwise will be run as console cmd and use env as parameters.
 
 `DURATION` and `MAX` must use one and can only use one.
+
+## Web parameters
+
+Only needed when `MODE=WEB`.
+
+
+
